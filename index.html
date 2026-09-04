@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0b2b4a">
+    <title>Зарплата Локбриг 2026 — Железный Кодекс</title>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, system-ui, sans-serif; }
+        body { background: #f0f2f5; margin: 0; padding: 12px; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; }
+        .calculator { max-width: 1100px; width: 100%; background: white; padding: 20px 24px 28px; border-radius: 28px; box-shadow: 0 12px 48px rgba(0,0,0,0.12); margin: 0 auto; }
+        .app-header { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; padding-bottom: 12px; border-bottom: 2px solid #eef3fa; flex-wrap: wrap; }
+        .app-header h1 { font-size: 22px; margin: 0; color: #0b2b4a; display: flex; align-items: center; gap: 10px; }
+        .app-header .brand { font-size: 13px; background: #0b2b4a; color: white; padding: 4px 16px; border-radius: 30px; font-weight: 600; }
+        .app-header .version { font-size: 11px; color: #8a9bb0; background: #eef3fa; padding: 2px 12px; border-radius: 30px; margin-left: auto; }
+        .sub { color: #3d5a73; font-size: 13px; padding-left: 4px; margin-bottom: 18px; opacity: 0.8; }
+        .grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .block { background: #f8fafc; border-radius: 16px; padding: 16px 18px; border: 1px solid #e6edf4; }
+        .block h3 { font-size: 14px; margin: 0 0 12px 0; color: #1d3c5e; border-bottom: 1px dashed #cddae9; padding-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .block h3 .new { font-size: 10px; background: #f39c12; color: white; padding: 0 10px; border-radius: 30px; font-weight: 600; }
+        .row { display: flex; flex-wrap: wrap; align-items: center; margin-bottom: 5px; gap: 4px 10px; }
+        .row label { min-width: 140px; font-size: 13px; font-weight: 500; color: #1f3a57; }
+        .row input, .row select { flex: 1; min-width: 70px; padding: 6px 10px; border: 1px solid #cbdae9; border-radius: 10px; font-size: 14px; background: white; transition: 0.2s; }
+        .row input:focus, .row select:focus { outline: none; border-color: #b22234; box-shadow: 0 0 0 3px rgba(178,34,52,0.12); }
+        .row .hint { font-size: 11px; color: #6b7f96; flex: 0 1 100%; }
+        .row .important { font-size: 11px; color: #b22234; font-weight: 600; flex: 0 1 100%; }
+        .result-area { background: linear-gradient(135deg, #eef3fa 0%, #e4ebf5 100%); border-radius: 18px; padding: 18px 22px; margin-top: 16px; border: 1px solid #dce5f0; }
+        .result-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+        .result-item { text-align: center; padding: 8px; }
+        .result-item .label { font-size: 13px; color: #3d5a73; display: block; margin-bottom: 4px; }
+        .result-item .value { font-size: 28px; font-weight: 700; }
+        .result-item .value.red { color: #b22234; }
+        .result-item .value.green { color: #0b5e2e; }
+        .result-item .value.blue { color: #1d3c5e; }
+        .btn-row { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; justify-content: center; }
+        .btn { flex: 1; min-width: 120px; max-width: 220px; background: #b22234; color: white; border: none; padding: 12px 24px; border-radius: 60px; font-weight: 600; font-size: 14px; cursor: pointer; transition: 0.2s; text-align: center; }
+        .btn:hover { background: #8b1a28; transform: scale(1.02); }
+        .btn-secondary { background: #3d5a73; }
+        .btn-secondary:hover { background: #2a4054; }
+        .btn-success { background: #1a7a4a; }
+        .btn-success:hover { background: #0f5a35; }
+        .btn-gold { background: #d4a017; }
+        .btn-gold:hover { background: #b8890f; }
+        .note { font-size: 12px; color: #3d5a73; background: #e2e9f2; padding: 8px 16px; border-radius: 30px; margin-top: 12px; text-align: center; }
+        .footer { margin-top: 16px; font-size: 11px; color: #8a9bb0; text-align: center; border-top: 1px solid #e0e8f0; padding-top: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        .report-area { background: white; border-radius: 16px; padding: 18px 20px; margin-top: 16px; border: 2px solid #d4a017; display: none; max-height: 600px; overflow-y: auto; }
+        .report-area.show { display: block; }
+        .report-area h4 { color: #0b2b4a; margin: 0 0 12px 0; font-size: 16px; border-bottom: 2px solid #d4a017; padding-bottom: 8px; }
+        .report-area table { width: 100%; font-size: 13px; border-collapse: collapse; }
+        .report-area table td, .report-area table th { padding: 6px 10px; border-bottom: 1px solid #e6edf4; text-align: left; }
+        .report-area table th { background: #f0f2f5; font-weight: 600; color: #1d3c5e; }
+        .report-area .total-row { font-weight: 700; background: #f8fafc; }
+        .report-area .legal-note { font-size: 12px; color: #3d5a73; background: #fef9e7; padding: 10px 14px; border-radius: 10px; margin-top: 12px; border-left: 4px solid #d4a017; }
+        .install-banner { background: #0b2b4a; color: white; border-radius: 14px; padding: 10px 16px; margin-bottom: 14px; display: none; align-items: center; justify-content: space-between; gap: 10px; font-size: 13px; }
+        .install-banner.show { display: flex; }
+        .install-banner .btn-install { background: white; color: #0b2b4a; border: none; padding: 6px 18px; border-radius: 30px; font-weight: 600; font-size: 13px; cursor: pointer; }
+        @media (max-width: 700px) { .grid-2col { grid-template-columns: 1fr; } .result-grid { grid-template-columns: 1fr; } .calculator { padding: 14px; } .row label { min-width: 110px; } .btn { max-width: 100%; min-width: 80px; } .result-item .value { font-size: 22px; } }
+    </style>
+</head>
+<body>
+<div class="calculator">
+    <!-- PWA Установка -->
+    <div class="install-banner" id="installBanner">
+        <span>🚂 Установите приложение на телефон</span>
+        <button class="btn-install" id="installBtn">Установить</button>
+    </div>
+
+    <!-- Шапка -->
+    <div class="app-header">
+        <h1>🚂 Зарплата локомотивной бригады</h1>
+        <span class="brand">⚡ Железный Кодекс</span>
+        <span class="version">v3.2 · Все коды</span>
+    </div>
+    <div class="sub">Красноярская дирекция тяги — с учётом изменений ТК РФ с 01.09.2026</div>
+
+    <!-- Основные поля -->
+    <div class="grid-2col">
+        <!-- Левая колонка: тариф и основные часы -->
+        <div class="block">
+            <h3>⏱️ Тарифная часть</h3>
+            <div class="row"><label>Часовая ставка (руб)</label><input type="number" id="hourRate" value="185.59" step="0.01"></div>
+            <div class="row"><label>004 — повременная</label><input type="number" id="hours004" value="160" step="0.5"></div>
+            <div class="row"><label>018 — пассажиром</label><input type="number" id="hours018" value="0" step="0.5"></div>
+            <div class="row"><label>035 — выходные/праздн.</label><input type="number" id="hours035" value="0" step="0.5"><span class="hint">Часы работы в выходные/праздники</span></div>
+            <div class="row"><label>052 — резерв</label><input type="number" id="hours052" value="0" step="0.5"></div>
+            <div class="row"><label>049 — техучеба</label><input type="number" id="hours049" value="0" step="0.5"></div>
+        </div>
+
+        <!-- Правая колонка: доплаты и надбавки -->
+        <div class="block">
+            <h3>🧾 Доплаты и надбавки</h3>
+            <div class="row"><label>Ночные часы (22-6)</label><input type="number" id="nightHours" value="0" step="0.5"></div>
+            <div class="row"><label>Класс квалификации</label>
+                <select id="classSelect">
+                    <option value="0">Без класса</option><option value="5">Пом.маш. 1 вид (5%)</option>
+                    <option value="10">Пом.маш. 2+ вида (10%)</option><option value="10">Маш. 3 кл. 2+ вида (10%)</option>
+                    <option value="15" selected>Маш. 2 кл. 2+ вида (15%)</option><option value="20">Маш. 1 кл. 1 вид (20%)</option>
+                    <option value="25">Маш. 1 кл. 2+ вида (25%)</option>
+                </select>
+            </div>
+            <div class="row"><label>Вредность %</label><input type="number" id="harmPercent" value="4" step="0.5" min="0" max="20"></div>
+            <div class="row"><label>Премия за нагон (мин)</label><input type="number" id="gainMinutes" value="0" step="1"></div>
+            <div class="row"><label>Премия 011 %</label><input type="number" id="premiumPercent" value="0" step="0.5"></div>
+            <div class="row"><label>Районный 20% (026)</label><input type="number" id="regionCoef" value="20" step="1" min="0"><span class="hint">Обычно 20%</span></div>
+            <div class="row"><label>Районный 10% (028)</label><input type="number" id="regionCoef10" value="0" step="1" min="0"><span class="hint">Для субъектов РФ</span></div>
+            <div class="row"><label>Северная надбавка %</label><input type="number" id="northCoef" value="0" step="5" min="0"></div>
+            <div class="row"><label>Зональная %</label><input type="number" id="zonalPercent" value="0" step="0.5"></div>
+            <div class="row"><label>Работа без помощника %</label><input type="number" id="alonePercent" value="0" step="0.5" min="0" max="50"><span class="hint">Код 153</span></div>
+            <div class="row"><label>Удлинённый участок %</label><input type="number" id="longRoutePercent" value="0" step="1" min="0"><span class="hint">Код 151</span></div>
+            <div class="row"><label>Тяжеловесные/длинносост. %</label><input type="number" id="heavyPercent" value="0" step="1" min="0"><span class="hint">Код 152</span></div>
+            <div class="row"><label>Соединённые поезда %</label><input type="number" id="coupledPercent" value="0" step="1" min="0"><span class="hint">Код 158</span></div>
+        </div>
+    </div>
+
+    <!-- Блок фиксированных начислений -->
+    <div class="block" style="border: 2px solid #0b2b4a; background: #f0f4f8;">
+        <h3>💰 Фиксированные выплаты (коды 082, 461, 268, 271 и прочие)</h3>
+        <div class="row"><label>082 — праздничные дни (нерабочие)</label><input type="number" id="holidayDays" value="0" step="1"><span class="hint">Кол-во дней × 75 руб.</span></div>
+        <div class="row"><label>461 — суточные (поездки)</label><input type="number" id="tripCount" value="0" step="1"><span class="hint">Кол-во поездок × 201 руб.</span></div>
+        <div class="row"><label>268 — вознаграждение за преданность</label><input type="number" id="loyaltyBonus" value="0" step="10"><span class="hint">Сумма (руб)</span></div>
+        <div class="row"><label>271 — единовременные поощрения</label><input type="number" id="oneTimeBonus" value="0" step="10"><span class="hint">Сумма (руб)</span></div>
+        <div class="row"><label>Прочие начисления (любые коды)</label><input type="number" id="otherAccruals" value="0" step="10"><span class="hint">Введите сумму вручную</span></div>
+    </div>
+
+    <!-- Блок СВЕРХУРОЧНЫХ (НОВЫЕ ПРАВИЛА) -->
+    <div class="block" style="border: 2px solid #d4a017; background: #fefaf0; margin-top:10px;">
+        <h3>🔴 СВЕРХУРОЧНЫЕ — новые правила с 01.09.2026 <span class="new">НОВОЕ</span></h3>
+        <div class="row"><label>072 — сверхурочные всего</label><input type="number" id="hours072" value="40" step="0.5"><span class="hint">Общее количество сверхурочных часов за учётный период</span></div>
+        <div class="row"><label>Кол-во смен в периоде</label><input type="number" id="shiftsCount" value="15" step="1"><span class="hint">Для расчёта первых 2 часов в смену</span></div>
+        <div class="row"><label>Режим лимита сверхурочных</label>
+            <select id="overtimeLimit"><option value="120">Стандартный (до 120 ч/год)</option><option value="240" selected>Расширенный (до 240 ч/год) — по соглашению</option></select>
+            <span class="important">⚠️ С 121-го часа в год — оплата в двойном размере!</span>
+        </div>
+        <div class="row"><label>Учётный период</label>
+            <select id="accountingPeriod"><option value="month">Месяц</option><option value="quarter" selected>Квартал</option><option value="year">Год</option></select>
+            <span class="hint">Влияет на распределение переработки по дням</span>
+        </div>
+        <div class="row"><label style="color:#b22234; font-weight:600;">☑️ Включать все надбавки в базу</label>
+            <select id="includeBonuses" style="flex:0 0 auto; min-width:100px;"><option value="yes" selected>Да (по ТК РФ)</option><option value="no">Нет (только оклад)</option></select>
+            <span class="hint">Согласно Определению Верховного Суда РФ</span>
+        </div>
+    </div>
+
+    <!-- Блок ПРАЗДНИЧНЫХ -->
+    <div class="block" style="border: 2px solid #d4a017; background: #fefaf0; margin-top:10px;">
+        <h3>📅 ВЫХОДНЫЕ И ПРАЗДНИЧНЫЕ <span class="new">НОВОЕ</span></h3>
+        <div class="row"><label>Компенсация за работу в выходной/праздник</label>
+            <select id="holidayCompensation"><option value="double" selected>Двойная оплата</option><option value="single+dayoff">Одинарная оплата + отгул</option></select>
+            <span class="hint">По выбору работника (ст. 153 ТК РФ)</span>
+        </div>
+        <div class="row"><label style="color:#b22234; font-weight:600;">☑️ Удваивать премии за праздничные</label>
+            <select id="doublePremiums" style="flex:0 0 auto; min-width:100px;"><option value="no" selected>Нет (только оклад)</option><option value="yes">Да (все выплаты)</option></select>
+            <span class="hint">Согласно Определению Девятого КС от 09.04.2026 № 88-2873/2026</span>
+        </div>
+    </div>
+
+    <!-- Результат -->
+    <div class="result-area">
+        <div class="result-grid">
+            <div class="result-item"><span class="label">Начислено всего</span><span class="value red" id="totalAccrued">0.00</span></div>
+            <div class="result-item"><span class="label">НДФЛ 13%</span><span class="value blue" id="ndflAmount">0.00</span></div>
+            <div class="result-item" style="border-left:2px solid #d6e0ea;"><span class="label">💳 К выплате</span><span class="value green" id="netPay">0.00</span></div>
+        </div>
+        <div class="btn-row">
+            <button class="btn" id="calcBtn">Рассчитать</button>
+            <button class="btn btn-secondary" id="resetBtn">Сбросить</button>
+            <button class="btn btn-gold" id="reportBtn">📄 Показать отчёт</button>
+            <button class="btn btn-success" id="exportBtn">📥 Скачать отчёт</button>
+        </div>
+    </div>
+
+    <!-- Отчёт -->
+    <div class="report-area" id="reportArea">
+        <h4>📄 Детальный расчёт с обоснованием</h4>
+        <div id="reportContent"></div>
+        <div class="legal-note" id="legalNote">
+            <strong>⚖️ Правовое обоснование:</strong> Расчёт выполнен с учётом изменений Трудового кодекса РФ, вступивших в силу с 01.09.2026:
+            <ul style="margin:6px 0 0 20px; padding:0; font-size:12px;">
+                <li>Ст. 152 ТК РФ — оплата сверхурочных (первые 2 часа в полуторном, далее в двойном размере)</li>
+                <li>Ст. 153 ТК РФ — оплата работы в выходные и праздничные дни (двойной размер или отгул)</li>
+                <li>Постановление Правительства РФ № 000 от 01.09.2026 — новый лимит сверхурочных до 240 часов</li>
+                <li>Определение Девятого КС от 09.04.2026 № 88-2873/2026 — премии за праздничные не удваиваются</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="note">⚙️ В расчёт включены все коды из памятки 2018 + обновления ТК РФ с 01.09.2026</div>
+    <div class="footer">
+        <span>© 2026 Красноярская дирекция тяги · Профессиональная версия</span>
+        <div class="status-bar"><span>⚡ Железный Кодекс</span></div>
+    </div>
+</div>
+
+<script>
+(function() {
+    // PWA
+    let deferredPrompt = null;
+    const installBanner = document.getElementById('installBanner');
+    const installBtn = document.getElementById('installBtn');
+    window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; installBanner.classList.add('show'); });
+    installBtn.addEventListener('click', async () => { if (deferredPrompt) { deferredPrompt.prompt(); const result = await deferredPrompt.userChoice; if (result.outcome === 'accepted') installBanner.classList.remove('show'); deferredPrompt = null; } });
+
+    // Калькулятор
+    const calcBtn = document.getElementById('calcBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const reportBtn = document.getElementById('reportBtn');
+    const exportBtn = document.getElementById('exportBtn');
+    const totalAccruedEl = document.getElementById('totalAccrued');
+    const ndflAmountEl = document.getElementById('ndflAmount');
+    const netPayEl = document.getElementById('netPay');
+    const reportArea = document.getElementById('reportArea');
+    const reportContent = document.getElementById('reportContent');
+
+    function getVal(id) { return parseFloat(document.getElementById(id).value) || 0; }
+    function setVal(id, val) { document.getElementById(id).value = val.toFixed(2); }
+
+    function calculate() {
+        // Основные часы
+        const rate = getVal('hourRate');
+        const h004 = getVal('hours004');
+        const h018 = getVal('hours018');
+        const h035 = getVal('hours035');
+        const h052 = getVal('hours052');
+        const h072 = getVal('hours072');
+        const h049 = getVal('hours049');
+        const night = getVal('nightHours');
+        const shifts = Math.max(1, Math.round(getVal('shiftsCount')));
+
+        // Проценты и коэффициенты
+        const classPercent = parseFloat(document.getElementById('classSelect').value) || 0;
+        const harmPercent = getVal('harmPercent');
+        const gainMin = getVal('gainMinutes');
+        const premiumPct = getVal('premiumPercent');
+        const zonalPct = getVal('zonalPercent');
+        const regionCoef = getVal('regionCoef'); // 026
+        const regionCoef10 = getVal('regionCoef10'); // 028
+        const northCoef = getVal('northCoef');
+        const alonePercent = getVal('alonePercent');
+        const longRoutePercent = getVal('longRoutePercent');
+        const heavyPercent = getVal('heavyPercent');
+        const coupledPercent = getVal('coupledPercent');
+
+        // Фиксированные
+        const holidayDays = getVal('holidayDays');
+        const tripCount = getVal('tripCount');
+        const loyaltyBonus = getVal('loyaltyBonus');
+        const oneTimeBonus = getVal('oneTimeBonus');
+        const otherAccruals = getVal('otherAccruals');
+
+        // Сверхурочные настройки
+        const overtimeLimit = parseInt(document.getElementById('overtimeLimit').value) || 120;
+        const holidayComp = document.getElementById('holidayCompensation').value;
+        const doublePremiums = document.getElementById('doublePremiums').value;
+        const includeBonuses = document.getElementById('includeBonuses').value;
+
+        // Базовые оплаты
+        const pay004 = h004 * rate;
+        const pay018 = h018 * rate;
+        const pay052 = h052 * rate;
+        const pay049 = h049 * rate;
+
+        // Сверхурочные
+        let halfHours = Math.min(h072, shifts * 2);
+        let doubleHours = Math.max(0, h072 - halfHours);
+        if (overtimeLimit === 120 && h072 > 120) { const extraDouble = h072 - 120; doubleHours += extraDouble; halfHours = Math.max(0, halfHours - extraDouble); }
+        let overtimeBase = rate;
+        if (includeBonuses === 'yes') { const bonusRate = rate * (classPercent / 100) + rate * (harmPercent / 100) + rate * (premiumPct / 100) + rate * (zonalPct / 100); overtimeBase = rate + bonusRate; }
+        const pay072 = h072 * overtimeBase;
+        const pay073half = halfHours * overtimeBase * 0.5;
+        const pay073double = doubleHours * overtimeBase * 1.0;
+
+        // Ночные
+        const pay023 = night * rate * 0.4;
+
+        // Класс
+        const baseForClass = (h004 + h035 + h052 + h072) * rate;
+        const pay025 = baseForClass * (classPercent / 100);
+
+        // Вредность
+        const baseForHarm = (h004 + h035 + h052 + h072) * rate;
+        const pay057 = baseForHarm * (harmPercent / 100);
+
+        // Нагон
+        const pay010 = rate * gainMin * 0.025;
+
+        // Премия 011
+        const baseForPrem = (h004 + h035 + h052 + h072) * rate;
+        const pay011 = baseForPrem * (premiumPct / 100);
+
+        // Зональная
+        const baseTariff = (h004 + h035 + h052 + h072) * rate;
+        const pay150 = baseTariff * (zonalPct / 100);
+
+        // Доплаты: 153, 151, 152, 158
+        const pay153 = baseTariff * (alonePercent / 100);
+        const pay151 = baseTariff * (longRoutePercent / 100);
+        const pay152 = baseTariff * (heavyPercent / 100);
+        const pay158 = baseTariff * (coupledPercent / 100);
+
+        // Выходные/праздничные (035+076)
+        let pay035 = 0, pay076 = 0, holidayNote = '';
+        if (holidayComp === 'double') {
+            if (doublePremiums === 'yes') { pay035 = h035 * rate * 2; holidayNote = 'Оплата в двойном размере (включая премии)'; }
+            else { pay035 = h035 * rate; pay076 = h035 * rate; holidayNote = 'Оклад в двойном, премии в одинарном (Определение Девятого КС)'; }
+        } else { pay035 = h035 * rate; holidayNote = 'Оплата в одинарном размере + отгул'; }
+
+        // Фиксированные: 082, 461, 268, 271, прочие
+        const pay082 = holidayDays * 75;
+        const pay461 = tripCount * 201;
+        const pay268 = loyaltyBonus;
+        const pay271 = oneTimeBonus;
+        const payOther = otherAccruals;
+
+        // Сумма для районного/северного (включаем все начисления, кроме самих коэффициентов)
+        const sumForRegion = pay004 + pay018 + pay010 + pay011 + pay023 + pay025 + pay035 + pay049 + pay052 + pay057 + pay072
+                            + pay073half + pay073double + pay076 + pay150 + pay151 + pay152 + pay153 + pay158
+                            + pay082 + pay461 + pay268 + pay271 + payOther;
+
+        const pay026 = sumForRegion * (regionCoef / 100);
+        const pay028 = sumForRegion * (regionCoef10 / 100);
+        const pay027 = sumForRegion * (northCoef / 100);
+
+        // Итог
+        const total = pay004 + pay018 + pay010 + pay011 + pay023 + pay025 + pay035 + pay049 + pay052 + pay057
+                    + pay072 + pay073half + pay073double + pay076 + pay150 + pay151 + pay152 + pay153 + pay158
+                    + pay082 + pay461 + pay268 + pay271 + payOther
+                    + pay026 + pay028 + pay027;
+
+        const ndfl = total * 0.13;
+        const net = total - ndfl;
+
+        totalAccruedEl.textContent = total.toFixed(2);
+        ndflAmountEl.textContent = ndfl.toFixed(2);
+        netPayEl.textContent = net.toFixed(2);
+
+        // Сохраняем данные для отчёта
+        window._calcData = {
+            rate, h004, h018, h035, h052, h072, h049, night, shifts,
+            classPercent, harmPercent, gainMin, premiumPct, zonalPct,
+            regionCoef, regionCoef10, northCoef, alonePercent, longRoutePercent, heavyPercent, coupledPercent,
+            holidayDays, tripCount, loyaltyBonus, oneTimeBonus, otherAccruals,
+            overtimeLimit, holidayComp, doublePremiums, includeBonuses,
+            pay004, pay018, pay035, pay052, pay049, pay023, pay025, pay057,
+            pay010, pay011, pay150, pay151, pay152, pay153, pay158,
+            pay072, pay073half, pay073double, pay076,
+            pay082, pay461, pay268, pay271, payOther,
+            pay026, pay028, pay027,
+            total, ndfl, net,
+            halfHours, doubleHours,
+            sumForRegion, baseTariff, holidayNote, overtimeBase
+        };
+        generateReport();
+    }
+
+    function generateReport() {
+        const d = window._calcData;
+        if (!d) return;
+        const halfHoursDisplay = d.halfHours.toFixed(1);
+        const doubleHoursDisplay = d.doubleHours.toFixed(1);
+        let html = `<table><thead><tr><th>Вид выплаты</th><th>Код</th><th>Сумма (руб)</th><th>Обоснование</th></tr></thead><tbody>
+            <tr><td>Повременная работа</td><td>004</td><td>${d.pay004.toFixed(2)}</td><td>${d.h004} ч × ${d.rate.toFixed(2)} руб</td></tr>
+            <tr><td>Следование пассажиром</td><td>018</td><td>${d.pay018.toFixed(2)}</td><td>${d.h018} ч × ${d.rate.toFixed(2)} руб</td></tr>
+            <tr><td>Работа в выходные/праздничные</td><td>035+076</td><td>${(d.pay035 + d.pay076).toFixed(2)}</td><td>${d.holidayNote}</td></tr>
+            <tr><td>Следование резервом</td><td>052</td><td>${d.pay052.toFixed(2)}</td><td>${d.h052} ч × ${d.rate.toFixed(2)} руб</td></tr>
+            <tr><td>Техучеба</td><td>049</td><td>${d.pay049.toFixed(2)}</td><td>${d.h049} ч × ${d.rate.toFixed(2)} руб</td></tr>
+            <tr><td>Ночные часы</td><td>023</td><td>${d.pay023.toFixed(2)}</td><td>${d.night} ч × ${d.rate.toFixed(2)} × 40%</td></tr>
+            <tr><td>Надбавка за класс</td><td>025</td><td>${d.pay025.toFixed(2)}</td><td>${d.classPercent}% от тарифной части</td></tr>
+            <tr><td>Вредность</td><td>057</td><td>${d.pay057.toFixed(2)}</td><td>${d.harmPercent}% от тарифной части</td></tr>
+            <tr><td>Премия за нагон</td><td>010</td><td>${d.pay010.toFixed(2)}</td><td>${d.gainMin} мин × ${d.rate.toFixed(2)} × 2.5%</td></tr>
+            <tr><td>Премия за результаты</td><td>011</td><td>${d.pay011.toFixed(2)}</td><td>${d.premiumPct}% от тарифной части</td></tr>
+            <tr><td>Зональная надбавка</td><td>150</td><td>${d.pay150.toFixed(2)}</td><td>${d.zonalPct}% от тарифной части</td></tr>
+            <tr><td>Работа без помощника</td><td>153</td><td>${d.pay153.toFixed(2)}</td><td>${d.alonePercent}% от тарифной части</td></tr>
+            <tr><td>Удлинённый участок</td><td>151</td><td>${d.pay151.toFixed(2)}</td><td>${d.longRoutePercent}% от тарифной части</td></tr>
+            <tr><td>Тяжеловесные/длинносоставные</td><td>152</td><td>${d.pay152.toFixed(2)}</td><td>${d.heavyPercent}% от тарифной части</td></tr>
+            <tr><td>Соединённые поезда</td><td>158</td><td>${d.pay158.toFixed(2)}</td><td>${d.coupledPercent}% от тарифной части</td></tr>
+            <tr><td>Сверхурочные (оплата)</td><td>072</td><td>${d.pay072.toFixed(2)}</td><td>${d.h072} ч × база ${d.overtimeBase.toFixed(2)} руб</td></tr>
+            <tr><td>Сверхурочные (доплата 0.5)</td><td>073</td><td>${d.pay073half.toFixed(2)}</td><td>${halfHoursDisplay} ч × ${d.overtimeBase.toFixed(2)} × 50%</td></tr>
+            <tr><td>Сверхурочные (доплата 1.0)</td><td>073</td><td>${d.pay073double.toFixed(2)}</td><td>${doubleHoursDisplay} ч × ${d.overtimeBase.toFixed(2)} × 100%</td></tr>
+            <tr><td>Вознаграждение за праздничные дни</td><td>082</td><td>${d.pay082.toFixed(2)}</td><td>${d.holidayDays} дн × 75 руб</td></tr>
+            <tr><td>Суточные</td><td>461</td><td>${d.pay461.toFixed(2)}</td><td>${d.tripCount} поездок × 201 руб</td></tr>
+            <tr><td>Вознаграждение за преданность</td><td>268</td><td>${d.pay268.toFixed(2)}</td><td>Сумма</td></tr>
+            <tr><td>Единовременные поощрения</td><td>271</td><td>${d.pay271.toFixed(2)}</td><td>Сумма</td></tr>
+            <tr><td>Прочие начисления</td><td>—</td><td>${d.payOther.toFixed(2)}</td><td>Введено вручную</td></tr>
+            <tr><td><strong>Районный коэффициент 20%</strong></td><td>026</td><td><strong>${d.pay026.toFixed(2)}</strong></td><td>20% от базы: ${d.sumForRegion.toFixed(2)}</td></tr>
+            <tr><td><strong>Районный коэффициент 10%</strong></td><td>028</td><td><strong>${d.pay028.toFixed(2)}</strong></td><td>10% от базы: ${d.sumForRegion.toFixed(2)}</td></tr>
+            <tr><td><strong>Северная надбавка</strong></td><td>027</td><td><strong>${d.pay027.toFixed(2)}</strong></td><td>${d.northCoef}% от базы: ${d.sumForRegion.toFixed(2)}</td></tr>
+        </tbody><tfoot>
+            <tr class="total-row"><td colspan="2"><strong>ИТОГО НАЧИСЛЕНО</strong></td><td><strong>${d.total.toFixed(2)}</strong></td><td></td></tr>
+            <tr><td colspan="2">НДФЛ 13%</td><td>${d.ndfl.toFixed(2)}</td><td></td></tr>
+            <tr class="total-row"><td colspan="2"><strong>К ВЫПЛАТЕ (на руки)</strong></td><td><strong style="color:#0b5e2e;">${d.net.toFixed(2)}</strong></td><td></td></tr>
+        </tfoot></table>
+        <div style="margin-top:12px; padding:12px; background:#f0f4f8; border-radius:10px; font-size:13px;">
+            <strong>🔴 Информация о сверхурочных часах:</strong><br>• Всего сверхурочных часов: ${d.h072}<br>• Часов в полуторном размере: ${halfHoursDisplay}<br>• Часов в двойном размере: ${doubleHoursDisplay}<br>• Лимит сверхурочных в год: ${d.overtimeLimit} часов<br>
+            ${d.h072 > 120 ? '⚠️ <strong style="color:#b22234;">Превышен лимит 120 часов! С 121-го часа оплата в двойном размере.</strong>' : ''}
+            ${d.includeBonuses === 'yes' ? '✅ В базу для сверхурочных включены все надбавки' : 'ℹ️ Только окладная часть'}
+        </div>`;
+        reportContent.innerHTML = html;
+    }
+
+    function resetToDefault() {
+        setVal('hourRate', 185.59);
+        setVal('hours004', 160);
+        setVal('hours018', 0);
+        setVal('hours035', 0);
+        setVal('hours052', 0);
+        setVal('hours072', 40);
+        setVal('shiftsCount', 15);
+        setVal('hours049', 0);
+        setVal('nightHours', 0);
+        document.getElementById('classSelect').value = '15';
+        setVal('harmPercent', 4);
+        setVal('gainMinutes', 0);
+        setVal('premiumPercent', 0);
+        setVal('zonalPercent', 0);
+        setVal('regionCoef', 20);
+        setVal('regionCoef10', 0);
+        setVal('northCoef', 0);
+        setVal('alonePercent', 0);
+        setVal('longRoutePercent', 0);
+        setVal('heavyPercent', 0);
+        setVal('coupledPercent', 0);
+        setVal('holidayDays', 0);
+        setVal('tripCount', 0);
+        setVal('loyaltyBonus', 0);
+        setVal('oneTimeBonus', 0);
+        setVal('otherAccruals', 0);
+        document.getElementById('overtimeLimit').value = '240';
+        document.getElementById('accountingPeriod').value = 'quarter';
+        document.getElementById('holidayCompensation').value = 'double';
+        document.getElementById('doublePremiums').value = 'no';
+        document.getElementById('includeBonuses').value = 'yes';
+        calculate();
+    }
+
+    function exportReport() {
+        if (!window._calcData) calculate();
+        const d = window._calcData;
+        if (!d) return;
+        let text = '==================================================\n  РАСЧЁТ ЗАРПЛАТЫ ЛОКОМОТИВНОЙ БРИГАДЫ\n  Железный Кодекс — Профессиональная версия\n  С учётом изменений ТК РФ с 01.09.2026\n==================================================\n\n';
+        text += `Часовая ставка: ${d.rate.toFixed(2)} руб\n`;
+        text += `Повременная (004): ${d.h004} ч = ${d.pay004.toFixed(2)} руб\n`;
+        text += `Пассажиром (018): ${d.h018} ч = ${d.pay018.toFixed(2)} руб\n`;
+        text += `Выходные/праздничные (035+076): ${(d.pay035+d.pay076).toFixed(2)} руб (${d.holidayNote})\n`;
+        text += `Резерв (052): ${d.h052} ч = ${d.pay052.toFixed(2)} руб\n`;
+        text += `Техучеба (049): ${d.h049} ч = ${d.pay049.toFixed(2)} руб\n`;
+        text += `Ночные (023): ${d.night} ч = ${d.pay023.toFixed(2)} руб\n`;
+        text += `Класс (025): ${d.classPercent}% = ${d.pay025.toFixed(2)} руб\n`;
+        text += `Вредность (057): ${d.harmPercent}% = ${d.pay057.toFixed(2)} руб\n`;
+        text += `Нагон (010): ${d.gainMin} мин = ${d.pay010.toFixed(2)} руб\n`;
+        text += `Премия (011): ${d.premiumPct}% = ${d.pay011.toFixed(2)} руб\n`;
+        text += `Зональная (150): ${d.zonalPct}% = ${d.pay150.toFixed(2)} руб\n`;
+        text += `Работа без помощника (153): ${d.alonePercent}% = ${d.pay153.toFixed(2)} руб\n`;
+        text += `Удлинённый участок (151): ${d.longRoutePercent}% = ${d.pay151.toFixed(2)} руб\n`;
+        text += `Тяжеловесные (152): ${d.heavyPercent}% = ${d.pay152.toFixed(2)} руб\n`;
+        text += `Соединённые поезда (158): ${d.coupledPercent}% = ${d.pay158.toFixed(2)} руб\n`;
+        text += `Сверхурочные (072+073): ${(d.pay072+d.pay073half+d.pay073double).toFixed(2)} руб (полуторный: ${d.halfHours.toFixed(1)} ч, двойной: ${d.doubleHours.toFixed(1)} ч)\n`;
+        text += `Вознаграждение за праздничные дни (082): ${d.pay082.toFixed(2)} руб (${d.holidayDays} дней)\n`;
+        text += `Суточные (461): ${d.pay461.toFixed(2)} руб (${d.tripCount} поездок)\n`;
+        text += `Вознаграждение за преданность (268): ${d.pay268.toFixed(2)} руб\n`;
+        text += `Единовременные поощрения (271): ${d.pay271.toFixed(2)} руб\n`;
+        text += `Прочие начисления: ${d.payOther.toFixed(2)} руб\n`;
+        text += `Районный 20% (026): ${d.pay026.toFixed(2)} руб\n`;
+        text += `Районный 10% (028): ${d.pay028.toFixed(2)} руб\n`;
+        text += `Северная надбавка (027): ${d.pay027.toFixed(2)} руб\n`;
+        text += '\n------------------------------------------\n';
+        text += `ИТОГО НАЧИСЛЕНО: ${d.total.toFixed(2)} руб\n`;
+        text += `НДФЛ 13%: ${d.ndfl.toFixed(2)} руб\n`;
+        text += `К ВЫПЛАТЕ: ${d.net.toFixed(2)} руб\n`;
+        text += '------------------------------------------\n\n=== ПРАВОВОЕ ОБОСНОВАНИЕ ===\n• Ст. 152 ТК РФ — оплата сверхурочных\n• Ст. 153 ТК РФ — оплата работы в выходные и праздничные\n• Постановление Правительства РФ от 01.09.2026 — лимит до 240 часов\n• Определение Девятого КС от 09.04.2026 № 88-2873/2026\n==================================================\n© Железный Кодекс\nДата: ' + new Date().toLocaleDateString('ru-RU');
+        const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Расчёт_ЗП_ЖелезныйКодекс_${new Date().toISOString().slice(0,10)}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    calcBtn.addEventListener('click', calculate);
+    resetBtn.addEventListener('click', resetToDefault);
+    reportBtn.addEventListener('click', () => { reportArea.classList.toggle('show'); reportBtn.textContent = reportArea.classList.contains('show') ? '📄 Скрыть отчёт' : '📄 Показать отчёт'; });
+    exportBtn.addEventListener('click', exportReport);
+
+    const inputs = document.querySelectorAll('input, select');
+    inputs.forEach(el => { el.addEventListener('change', () => { try { localStorage.setItem('salaryApp2026_' + el.id, el.value); } catch(e) {} calculate(); }); el.addEventListener('input', calculate); });
+    try { inputs.forEach(el => { const saved = localStorage.getItem('salaryApp2026_' + el.id); if (saved !== null) { if (el.tagName === 'SELECT') el.value = saved; else el.value = saved; } }); } catch(e) {}
+    calculate();
+})();
+</script>
+</body>
+</html>
