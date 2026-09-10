@@ -59,12 +59,12 @@
         }
         .gate-box {
             background: white; border-radius: 24px; padding: 40px 32px;
-            max-width: 420px; width: 100%; text-align: center;
+            max-width: 440px; width: 100%; text-align: center;
             box-shadow: 0 20px 60px rgba(0,0,0,0.4);
         }
         .gate-box .icon { font-size: 56px; margin-bottom: 12px; }
         .gate-box h2 { color: #0b2b4a; margin: 0 0 8px 0; font-size: 22px; }
-        .gate-box p { color: #3d5a73; font-size: 14px; margin: 0 0 20px 0; line-height: 1.5; }
+        .gate-box p { color: #3d5a73; font-size: 14px; margin: 0 0 16px 0; line-height: 1.5; }
         .gate-box input {
             width: 100%; padding: 14px 18px; border: 2px solid #cbdae9;
             border-radius: 12px; font-size: 16px; text-align: center;
@@ -79,7 +79,20 @@
         .gate-box button:hover { background: #8b1a28; }
         .gate-box .error { color: #b22234; font-size: 13px; margin-top: 8px; display: none; }
         .gate-box .brand-mark { font-size: 12px; color: #8a9bb0; margin-top: 20px; }
-        .gate-box .support-link { font-size: 12px; color: #3d5a73; margin-top: 16px; display: block; }
+        .gate-box .support-link { font-size: 12px; color: #3d5a73; margin-top: 12px; display: block; }
+
+        /* Блок с ценой */
+        .price-block {
+            background: #fef9e7;
+            border: 2px solid #d4a017;
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        .price-block .price-label { font-size: 12px; color: #8a6d1a; margin-bottom: 4px; }
+        .price-block .price-value { font-size: 26px; font-weight: 700; color: #0b2b4a; }
+        .price-block .price-note { font-size: 12px; color: #3d5a73; margin-top: 6px; }
 
         #calculatorContent { display: none; }
 
@@ -93,7 +106,16 @@
     <div class="gate-box">
         <div class="icon">🔒</div>
         <h2>Доступ только для покупателей</h2>
-        <p>Введите пароль, полученный после оплаты в боте <b>@ZarplataLokBrigBot</b></p>
+        <p>Профессиональный калькулятор расчёта зарплаты локомотивной бригады с учётом изменений ТК РФ с 01.09.2026</p>
+
+        <!-- Блок с ценой -->
+        <div class="price-block">
+            <div class="price-label">Стоимость доступа</div>
+            <div class="price-value">525 ₽</div>
+            <div class="price-note">Единоразовый платёж · доступ навсегда</div>
+            <div class="price-note">Оплата в Telegram-боте <b>@ZarplataLokBrigBot</b></div>
+        </div>
+
         <input type="password" id="passwordInput" placeholder="Введите пароль" autocomplete="off" onkeydown="if(event.key==='Enter') checkPassword()">
         <button onclick="checkPassword()">Войти</button>
         <div class="error" id="passwordError">❌ Неверный пароль. Проверьте и попробуйте снова.</div>
@@ -102,12 +124,12 @@
     </div>
 </div>
 
-<!-- КАЛЬКУЛЯТОР (скрыт до ввода пароля) -->
+<!-- КАЛЬКУЛЯТОР -->
 <div class="calculator" id="calculatorContent">
     <div class="app-header">
         <h1>🚂 Зарплата локомотивной бригады</h1>
         <span class="brand">⚡ Железный Кодекс</span>
-        <span class="version">v4.1 · Защищённая версия</span>
+        <span class="version">v4.2 · Защищённая версия</span>
     </div>
     <div class="sub">Профессиональный расчёт с учётом изменений ТК РФ с 01.09.2026</div>
 
@@ -201,7 +223,6 @@
         <div id="reportContent"></div>
     </div>
 
-    <!-- ОБНОВЛЁННЫЙ ФУТЕР -->
     <div class="footer">
         <span>© 2026 · Железный Кодекс</span><br>
         <span>Самозанятый: Жуков Иван Дмитриевич, ИНН: 190108824035</span><br>
